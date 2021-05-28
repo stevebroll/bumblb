@@ -1,0 +1,22 @@
+Package: bumblb
+Title: Better Unbalanced Mixture model Bag of Little Bootstrap
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Steve",
+           family = "Broll",
+           role = c("aut", "cre"),
+           email = "sb2643@cornell.edu"),
+    person(given = "Derek",
+           family = "Hoare",
+           role = c("aut"),
+           email = "doh24@cornell.edu"))
+Description: `bumblb` fits unbalanced mixture models using Bag of Little Bootstraps with various subsampling weights.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+LinkingTo: 
+    Rcpp
+Imports: 
+    Rcpp
