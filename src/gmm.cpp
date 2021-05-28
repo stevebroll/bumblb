@@ -59,9 +59,8 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     NumericVector::iterator it2 = std::max_element(X.begin(), X.end());
     double Xmin = *it;
     double Xmax = *it2;
-    double Xrange = Xmax-Xmin;
-    //Get randoms
-    for(int i = 0; i<d; i++) mu[i] =  (rand() / (RAND_MAX + 1.))*Xrange + Xmin;
+    mu = runif(d, Xmin, Xmax);
+
   }else{
     NumericVector temp(mu_);
     mu = temp;
