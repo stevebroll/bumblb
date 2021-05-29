@@ -90,11 +90,13 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
   double new_ll = -1e5; //for storing the log likelihood
 
   NumericMatrix gamma(N,d); //For storing responsibilities
+  double denoms[d];
 
   for(int i = 0; i<max_iter; i++){
     // E-Step
     for(int row = 0; row<N; row++){
       // Loop Through the X_i
+      // Reverse order of this loop!
       double denominator = 0;
       for(int col=0; col<d; col++){
         // Loop through the pi_i
@@ -107,10 +109,20 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     }
 
     // M-Step
+    // for(int col = 0; col<d; col++){
+    //   denoms[col] = 0.0; // initialize denoms
+    //   mu[col] = 0.0; // clear mu
+    // }
+    //
+    // for(int row = 0; row<N; row++){
+    //   for(int col = 0; col<d; col++){
+    //     mu[col] += gamma(row,col)*X[row];
+    //     denoms[col] += gamma(row,col);
+    //   }
+    // }
 
     for(int col=0; col<d; col++){
       // Compute the mus
-      // Reverse the order of these loops!
       mu[col] = 0.0;
       double temp = 0.0;
       for(int row=0; row<N; row++){
@@ -119,6 +131,26 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
       }
       mu[col] /= temp;
     }
+
+
+    // for(int col = 0; col<d; col++){
+    //   mu[col] /= denoms[col];   // Normalize mu
+    //   denoms[col] = 0.0;        // reset denoms
+    //   sd[col] = 0.0;            // clear sd
+    // }
+    //
+    // // Update the standard deviations
+    // for(int row = 0; row<N; row++){
+    //   for(int col = 0; col<d; col++){
+    //     sd[col] += gamma(row,col)*std::pow(X[row]-mu[col], 2.0);
+    //     denoms[col] += gamma(row,col);
+    //   }
+    // }
+    //
+    // for(int col = 0; col<d; col++){
+    //   sd[col] /= denoms[col];
+    //   sd[col] = std::sqrt(sd[col]);
+    // }
 
     for(int col=0; col<d; col++){
       //Compute the sigmas
@@ -133,12 +165,13 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
       sd[col] = std::sqrt(sd[col]);
     }
 
-    for(int col=0; col<d; col++){
-      //Compute the mixing probabilities
-      //Reverse the order of these loops!
-      pi[col] = 0.0;
-      for(int row=0; row<N; row++){
-        pi[col] += gamma(row,col)/(double) N;
+    //Reset pi before we set it
+    for(int i = 0; i<d; i++) pi[i] = 0.0;
+
+    //Compute pi
+    for(int row = 0; row<N; row++){
+      for(int col = 0;col<d; col++){
+        pi[col]+= gamma(row,col)/(double) N;
       }
     }
 
