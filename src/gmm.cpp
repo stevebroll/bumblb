@@ -5,25 +5,29 @@
 
 using namespace Rcpp;
 
-double mean(NumericVector X){
+double mean(NumericVector x){
+  //  Compute the mean of a vector x
   double total = 0;
-  for(int i = 0; i<X.size(); i++){
-    total += X[i];
+  for(int i = 0; i<x.size(); i++){
+    total += x[i];
   }
-  return total/X.size();
+  return total/x.size();
 }
 
-double stdev(NumericVector X){
+double stdev(NumericVector x){
+  // Compute the standard deviation of a vector x
   double var_val = 0;
-  double mean_val = mean(X);
-  for(int i=0; i<X.size(); i++){
-    var_val += (X[i] - mean_val)*(X[i] - mean_val);
+  double mean_val = mean(x);
+
+  for(int i=0; i<x.size(); i++){
+    var_val += (x[i] - mean_val)*(x[i] - mean_val);
   }
-  // Rcout << "Non-normalized Variance: "<< var_val << std::endl;
-  return std::sqrt(1/(X.size()-1.0)*var_val);
+
+  return std::sqrt(1/(x.size()-1.0)*var_val);
 }
 
 double dnorm(double x, double mu, double sigma){
+  // Returns the normal density at x with mean mu and standard deviation sd
   return std::exp(-std::pow(x-mu, 2.0)/(2.0*std::pow(sigma, 2.0)))*1.0/(sigma*std::sqrt(2.0*M_PI));
 }
 
@@ -31,7 +35,9 @@ double dnorm(double x, double mu, double sigma){
 // [[Rcpp::export]]
 List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
          Nullable<NumericVector> mu_ = R_NilValue,
-         Nullable<NumericVector> sd_ = R_NilValue, int max_iter = 10000, double tol = 1e-9){
+         Nullable<NumericVector> sd_ = R_NilValue, int max_iter = 10000, double tol = 1e-5){
+  // A classical Gaussian Mixture Model in C++
+  // Reference: The Elements of Statistical Learning
 
   //Initialize pi, mu, sigma
   NumericVector pi (d);
@@ -50,8 +56,6 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     pi = temp;
   }
 
-  // Rcout << pi << std::endl;
-
   //Set mu
   if(mu_.isNull()){
     // Random Values
@@ -60,7 +64,7 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     double Xmin = *it;
     double Xmax = *it2;
     mu = runif(d, Xmin, Xmax);
-
+    std::sort(mu.begin(), mu.end()); //Sort mu
   }else{
     NumericVector temp(mu_);
     mu = temp;
@@ -102,13 +106,11 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
       }
     }
 
-    // Print gamma
-    // return List::create(Named("gamma")=gamma);
-
     // M-Step
 
     for(int col=0; col<d; col++){
       // Compute the mus
+      // Reverse the order of these loops!
       mu[col] = 0.0;
       double temp = 0.0;
       for(int row=0; row<N; row++){
@@ -120,6 +122,7 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
 
     for(int col=0; col<d; col++){
       //Compute the sigmas
+      //Reverse the order of these loops!
       sd[col] = 0.0;
       double temp = 0.0;
       for(int row=0; row<N; row++){
@@ -132,6 +135,7 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
 
     for(int col=0; col<d; col++){
       //Compute the mixing probabilities
+      //Reverse the order of these loops!
       pi[col] = 0.0;
       for(int row=0; row<N; row++){
         pi[col] += gamma(row,col)/(double) N;
@@ -142,6 +146,7 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     double temp = 0.0;
     new_ll = 0.0;
     for(int row = 0; row<N; row++){
+      // Loops in correct order!
       temp = 0.0;
       for(int col = 0; col<d; col++){
         temp += pi[col]*dnorm(X[row], mu[col], sd[col]);
@@ -155,15 +160,16 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     if(delta_ll < tol && i>=30){
       Rcout << "Converged in " << i << " iterations!" << std::endl;
       return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd,
-                                Named("log-lik") = new_ll);
+                                Named("loglik") = new_ll);
     }
     old_ll = new_ll;
 
   }
 
-  Rcout << "Halted. Hit " <<max_iter << " Iterations";
+  Rcout << "Halted after " <<max_iter << " iterations." << std::endl;
 
-  return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd);
+  return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd,
+                      Named("loglik") = new_ll);
 }
 
 
