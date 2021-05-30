@@ -92,7 +92,7 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
   NumericMatrix gamma(N,d); //For storing responsibilities
   double denoms[d];
 
-  for(int i = 0; i<max_iter; i++){
+  for(int step = 0; step<max_iter; step++){
     // E-Step
     for(int row = 0; row<N; row++){
       // Loop Through the X_i
@@ -190,10 +190,10 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
     delta_ll = std::abs(new_ll-old_ll);
 
     // Check Convergence Criteria!
-    if(delta_ll < tol && i>=30){
-      Rcout << "Converged in " << i << " iterations!" << std::endl;
+    if(delta_ll < tol && step>=30){
+      Rcout << "Converged in " << step << " iterations!" << std::endl;
       return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd,
-                                Named("loglik") = new_ll);
+                                Named("loglik") = new_ll, Named("steps") = step);
     }
     old_ll = new_ll;
 
@@ -202,7 +202,7 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
   Rcout << "Halted after " <<max_iter << " iterations." << std::endl;
 
   return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd,
-                      Named("loglik") = new_ll);
+                      Named("loglik") = new_ll, Named("steps") = max_iter);
 }
 
 
