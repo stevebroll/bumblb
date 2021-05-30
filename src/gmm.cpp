@@ -14,17 +14,23 @@ double mean(NumericVector x){
   return total/x.size();
 }
 
+// double stdev(NumericVector x){
+//   // Compute the standard deviation of a vector x
+//   double var_val = 0;
+//   double mean_val = mean(x);
+//
+//   for(int i=0; i<x.size(); i++){
+//     var_val += (x[i] - mean_val)*(x[i] - mean_val);
+//   }
+//
+//   return std::sqrt(1/(x.size()-1.0)*var_val);
+// }
+
 double stdev(NumericVector x){
-  // Compute the standard deviation of a vector x
-  double var_val = 0;
-  double mean_val = mean(x);
-
-  for(int i=0; i<x.size(); i++){
-    var_val += (x[i] - mean_val)*(x[i] - mean_val);
-  }
-
-  return std::sqrt(1/(x.size()-1.0)*var_val);
+  return Rcpp::sd(x);
 }
+
+
 
 double dnorm(double x, double mu, double sigma){
   // Returns the normal density at x with mean mu and standard deviation sd
@@ -35,7 +41,8 @@ double dnorm(double x, double mu, double sigma){
 // [[Rcpp::export]]
 List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
          Nullable<NumericVector> mu_ = R_NilValue,
-         Nullable<NumericVector> sd_ = R_NilValue, int max_iter = 10000, double tol = 1e-5){
+         Nullable<NumericVector> sd_ = R_NilValue,
+         int max_iter = 10000, double tol = 1e-5){
   // A classical Gaussian Mixture Model in C++
   // Reference: The Elements of Statistical Learning
 
@@ -90,9 +97,12 @@ List gmm(NumericVector X, int d, Nullable<NumericVector> pi_ = R_NilValue,
   double new_ll = -1e5; //for storing the log likelihood
 
   NumericMatrix gamma(N,d); //For storing responsibilities
-  double denoms[d];
+  // double denoms[d];
 
   for(int step = 0; step<max_iter; step++){
+    if (step % 50 == 0)
+      Rcpp::checkUserInterrupt();
+
     // E-Step
     for(int row = 0; row<N; row++){
       // Loop Through the X_i
