@@ -3,17 +3,17 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-using namespace Rcpp;
+// using namespace Rcpp;
 
 // Implement a Gaussian Mixture Model in C++
 // [[Rcpp::export]]
-List gmm_annealing_schedule(NumericVector X, int d,
-                   Nullable<NumericVector> pi_ = R_NilValue,
-                   Nullable<NumericVector> mu_ = R_NilValue,
-                   Nullable<NumericVector> sd_ = R_NilValue,
+Rcpp::List gmm(Rcpp::NumericVector X, int d,
+                   Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
+                   Rcpp::Nullable<Rcpp::NumericVector> mu_ = R_NilValue,
+                   Rcpp::Nullable<Rcpp::NumericVector> sd_ = R_NilValue,
                    int max_iter = 10000, double tol = 1e-5,
                    double beta = 1.0, double c = 1.1,
-                   Nullable<NumericVector> schedule_ = R_NilValue){
+                   Rcpp::Nullable<Rcpp::NumericVector> schedule_ = R_NilValue){
   // A classical Gaussian Mixture Model in C++
   // References:  The Elements of Statistical Learning
   //              Deterministic Annealing EM Algorithm
@@ -33,19 +33,19 @@ List gmm_annealing_schedule(NumericVector X, int d,
   }
 
   //Initialize pi, mu, sigma
-  NumericVector pi (d);
-  NumericVector mu (d);
-  NumericVector sd (d);
-  NumericVector schedule;
+  Rcpp::NumericVector pi (d);
+  Rcpp::NumericVector mu (d);
+  Rcpp::NumericVector sd (d);
+  Rcpp::NumericVector schedule;
 
   // Set the annealing schedule
   if(!schedule_.isNull()){
-    NumericVector temp(schedule_);
+    Rcpp::NumericVector temp(schedule_);
     schedule = temp;
   }
   else if (beta>0 && c>1 && beta<1){
     int N = std::ceil(-std::log(beta)/std::log(c));
-    NumericVector temp (N);
+    Rcpp::NumericVector temp (N);
     for(int i=0; i<N; i++){
       temp[i] = beta*std::pow(c, i+1);
       if(temp[i]>1){
@@ -55,7 +55,7 @@ List gmm_annealing_schedule(NumericVector X, int d,
     schedule = temp;
   }
   else if (beta == 1){
-    NumericVector temp (1);
+    Rcpp::NumericVector temp (1);
     temp[0] = 1.0;
     schedule = temp;
   }
@@ -63,7 +63,7 @@ List gmm_annealing_schedule(NumericVector X, int d,
     throw "Improper scheduling criteria.";
   }
 
-  Rcout << "Annealing Schedule:" << std::endl << schedule << std::endl;
+  Rcpp::Rcout << "Annealing Schedule:" << std::endl << schedule << std::endl;
 
   const int N = X.size();
 
@@ -73,21 +73,21 @@ List gmm_annealing_schedule(NumericVector X, int d,
     double temp = 1.0/ (double) d;
     for(int i=0; i<d; i++) pi[i] = temp;
   }else{
-    NumericVector temp(pi_);
+    Rcpp::NumericVector temp(pi_);
     pi = temp;
   }
 
   //Set mu
   if(mu_.isNull()){
     // Random Values
-    NumericVector::iterator it = std::min_element(X.begin(), X.end());
-    NumericVector::iterator it2 = std::max_element(X.begin(), X.end());
+    Rcpp::NumericVector::iterator it = std::min_element(X.begin(), X.end());
+    Rcpp::NumericVector::iterator it2 = std::max_element(X.begin(), X.end());
     double Xmin = *it;
     double Xmax = *it2;
-    mu = runif(d, Xmin, Xmax);
+    mu = Rcpp::runif(d, Xmin, Xmax);
     std::sort(mu.begin(), mu.end()); //Sort mu
   }else{
-    NumericVector temp(mu_);
+    Rcpp::NumericVector temp(mu_);
     mu = temp;
   }
 
@@ -98,7 +98,7 @@ List gmm_annealing_schedule(NumericVector X, int d,
     // Rcout << "Standard Deviation" << temp << std::endl;
     for(int i=0; i<d; i++) sd[i] = temp;
   }else{
-    NumericVector temp(sd_);
+    Rcpp::NumericVector temp(sd_);
     sd = temp;
   }
 
@@ -110,7 +110,7 @@ List gmm_annealing_schedule(NumericVector X, int d,
   double delta_ll = 1;
   double new_ll = -1e5; //for storing the log likelihood
 
-  NumericMatrix gamma(N,d); //For storing responsibilities
+  Rcpp::NumericMatrix gamma(N,d); //For storing responsibilities
   // double denoms[d];
   for(int bstep = 0; bstep<schedule.size(); bstep++){
     delta_ll = 1;
@@ -119,7 +119,7 @@ List gmm_annealing_schedule(NumericVector X, int d,
     beta = (double) schedule[bstep];
 
     // Add a small amount of noise
-    mu += runif(d,-0.1,0.1); //should make this a function of the data
+    mu += Rcpp::runif(d,-0.1,0.1); //should make this a function of the data
     // sd += runif(d,-0.1,0.1);
     //std::sort(mu.begin(), mu.end()); //Sort mu
 
@@ -193,9 +193,9 @@ List gmm_annealing_schedule(NumericVector X, int d,
 
       // Check Convergence Criteria!
       if(delta_ll < tol && beta==1){
-        Rcout << "Converged!" << std::endl;
-        return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd,
-                                  Named("loglik") = new_ll);
+        Rcpp::Rcout << "Converged!" << std::endl;
+        return Rcpp::List::create(Rcpp::Named("pi") = pi, Rcpp::Named("mu") =  mu, Rcpp::Named("sd") = sd,
+                                  Rcpp::Named("loglik") = new_ll);
       }
       else if(delta_ll < tol){
         break;
@@ -204,14 +204,14 @@ List gmm_annealing_schedule(NumericVector X, int d,
       old_ll = new_ll;
 
     }
-    Rcout << beta << std::endl;
+    Rcpp::Rcout << beta << std::endl;
 
   }
 
-  Rcout << "Halted after " <<max_iter << " iterations." << std::endl;
+  Rcpp::Rcout << "Halted after " <<max_iter << " iterations." << std::endl;
 
-  return List::create(Named("pi") = pi, Named("mu") =  mu, Named("sd") = sd,
-                            Named("loglik") = new_ll);
+  return Rcpp::List::create(Rcpp::Named("pi") = pi, Rcpp::Named("mu") =  mu, Rcpp::Named("sd") = sd,
+                            Rcpp::Named("loglik") = new_ll);
 }
 
 

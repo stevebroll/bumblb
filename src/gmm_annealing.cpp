@@ -14,7 +14,9 @@ List gmm_annealing(NumericVector X, int d,
          int max_iter = 10000, double tol = 1e-5,
          double beta = 0.1, double c = 1.1){
   // A classical Gaussian Mixture Model in C++
-  // Reference: The Elements of Statistical Learning
+  // References:  The Elements of Statistical Learning
+  //              Deterministic Annealing EM Algorithm
+  // To Do: Add the ability to input an annealing schedule
 
   //Initialize pi, mu, sigma
   NumericVector pi (d);
