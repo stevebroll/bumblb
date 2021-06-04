@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 #include <stdlib.h>
-#include <gmm.h>
+#include "gmm.h"
 using namespace Rcpp;
 
 // [[Rcpp::export]]
