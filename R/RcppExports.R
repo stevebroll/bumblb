@@ -5,7 +5,7 @@ blb_mix <- function(y, b, s, r, d) {
     .Call('_bumblb_blb_mix', PACKAGE = 'bumblb', y, b, s, r, d)
 }
 
-gmm <- function(X, d, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-9) {
-    .Call('_bumblb_gmm', PACKAGE = 'bumblb', X, d, pi_, mu_, sd_, max_iter, tol)
+gmm <- function(X, d, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-5, beta = 1.0, c = 1.1, schedule_ = NULL) {
+    .Call('_bumblb_gmm', PACKAGE = 'bumblb', X, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_)
 }
 
