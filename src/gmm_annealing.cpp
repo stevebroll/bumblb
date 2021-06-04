@@ -5,39 +5,6 @@
 
 using namespace Rcpp;
 
-double mean(NumericVector x){
-  //  Compute the mean of a vector x
-  double total = 0;
-  for(int i = 0; i<x.size(); i++){
-    total += x[i];
-  }
-  return total/x.size();
-}
-
-// double stdev(NumericVector x){
-//   // Compute the standard deviation of a vector x
-//   double var_val = 0;
-//   double mean_val = mean(x);
-//
-//   for(int i=0; i<x.size(); i++){
-//     var_val += (x[i] - mean_val)*(x[i] - mean_val);
-//   }
-//
-//   return std::sqrt(1/(x.size()-1.0)*var_val);
-// }
-
-double stdev(NumericVector x){
-  return Rcpp::sd(x);
-}
-
-
-
-double dnorm(double x, double mu, double sigma){
-  // Returns the normal density at x with mean mu and standard deviation sd
-  return std::exp(-std::pow(x-mu, 2.0)/(2.0*std::pow(sigma, 2.0)))*1.0/(sigma*std::sqrt(2.0*M_PI));
-}
-
-
 // Implement a Gaussian Mixture Model in C++
 // [[Rcpp::export]]
 List gmm_annealing(NumericVector X, int d,
@@ -83,7 +50,7 @@ List gmm_annealing(NumericVector X, int d,
   //Set sigma
   if(sd_.isNull()){
     // Set to SD(X)
-    double temp = stdev(X);
+    double temp = Rcpp::sd(X);
     // Rcout << "Standard Deviation" << temp << std::endl;
     for(int i=0; i<d; i++) sd[i] = temp;
   }else{
@@ -125,7 +92,7 @@ List gmm_annealing(NumericVector X, int d,
         double denominator = 0;
         for(int col=0; col<d; col++){
           // Loop through the pi_i
-          gamma(row,col) = std::pow(pi[col]*dnorm(X[row], mu[col], sd[col]),beta);
+          gamma(row,col) = std::pow(pi[col]*R::dnorm(X[row], mu[col], sd[col], FALSE),beta);
           denominator += gamma(row,col);
         }
         for(int col=0; col<d; col++){
@@ -175,7 +142,7 @@ List gmm_annealing(NumericVector X, int d,
         // Loops in correct order!
         temp = 0.0;
         for(int col = 0; col<d; col++){
-          temp += pi[col]*dnorm(X[row], mu[col], sd[col]);
+          temp += pi[col]*R::dnorm(X[row], mu[col], sd[col], FALSE);
         }
         new_ll += std::log(temp);
       }
