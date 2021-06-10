@@ -6,12 +6,12 @@
 using namespace Rcpp;
 
 // blb_mix
-List blb_mix(NumericVector y, int b, int s, int r, int d);
+Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d);
 RcppExport SEXP _bumblb_blb_mix(SEXP ySEXP, SEXP bSEXP, SEXP sSEXP, SEXP rSEXP, SEXP dSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< int >::type b(bSEXP);
     Rcpp::traits::input_parameter< int >::type s(sSEXP);
     Rcpp::traits::input_parameter< int >::type r(rSEXP);
@@ -21,12 +21,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // gmm
-Rcpp::List gmm(Rcpp::NumericVector X, int d, Rcpp::Nullable<Rcpp::NumericVector> pi_, Rcpp::Nullable<Rcpp::NumericVector> mu_, Rcpp::Nullable<Rcpp::NumericVector> sd_, int max_iter, double tol, double beta, double c, Rcpp::Nullable<Rcpp::NumericVector> schedule_);
-RcppExport SEXP _bumblb_gmm(SEXP XSEXP, SEXP dSEXP, SEXP pi_SEXP, SEXP mu_SEXP, SEXP sd_SEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP betaSEXP, SEXP cSEXP, SEXP schedule_SEXP) {
+Rcpp::List gmm(Rcpp::NumericVector Y, int d, Rcpp::Nullable<Rcpp::NumericVector> pi_, Rcpp::Nullable<Rcpp::NumericVector> mu_, Rcpp::Nullable<Rcpp::NumericVector> sd_, int max_iter, double tol, double beta, double c, Rcpp::Nullable<Rcpp::NumericVector> schedule_);
+RcppExport SEXP _bumblb_gmm(SEXP YSEXP, SEXP dSEXP, SEXP pi_SEXP, SEXP mu_SEXP, SEXP sd_SEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP betaSEXP, SEXP cSEXP, SEXP schedule_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y(YSEXP);
     Rcpp::traits::input_parameter< int >::type d(dSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type pi_(pi_SEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type mu_(mu_SEXP);
@@ -36,7 +36,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type schedule_(schedule_SEXP);
-    rcpp_result_gen = Rcpp::wrap(gmm(X, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_));
+    rcpp_result_gen = Rcpp::wrap(gmm(Y, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_));
     return rcpp_result_gen;
 END_RCPP
 }

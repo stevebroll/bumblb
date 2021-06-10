@@ -5,7 +5,20 @@ blb_mix <- function(y, b, s, r, d) {
     .Call('_bumblb_blb_mix', PACKAGE = 'bumblb', y, b, s, r, d)
 }
 
-gmm <- function(X, d, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-5, beta = 1.0, c = 1.1, schedule_ = NULL) {
-    .Call('_bumblb_gmm', PACKAGE = 'bumblb', X, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_)
+#' GMM with Optional Annealing
+#'
+#' This function returns a list containing the estimated probabilities, means,
+#' standard deviations and log likelihoods of the fitted GMM. Implemented in
+#' C++
+#'
+#' @param Y Numeric data vector
+#' @param d Number of distributions in mixture model
+#' @param pi_ Optional vector of prior distribution sampling probabilities
+#' @param mu_ Optional vector of distribution means
+#' @param sd_ Optional vector of distribution standard deviations
+#' @param
+#' @export
+gmm <- function(Y, d, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-5, beta = 1.0, c = 1.1, schedule_ = NULL) {
+    .Call('_bumblb_gmm', PACKAGE = 'bumblb', Y, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_)
 }
 
