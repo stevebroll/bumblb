@@ -27,9 +27,32 @@ gmm(
 \item{mu_}{Optional vector of distribution means}
 
 \item{sd_}{Optional vector of distribution standard deviations}
+
+\item{max_iter}{Maximum number of iterations for EM algorithm. Default is
+10,000}
+
+\item{tol}{Tolerance for convergence of log likelihood for EM algorithm.}
+
+\item{beta}{Optional parameter representing the starting \eqn{\beta} for
+annealing. For the default of 1, standard EM algorithm is run. Only needs to
+be specified for annealing if schedule_ is left NULL}
+
+\item{c}{Optional secondary parameter that determines growth rate of
+\eqn{\beta}. Only needs to be specified for annealing if schedule_ is left
+NULL}
+
+\item{schedule_}{Optional scheduling for annealing, if not set to NULL the
+schedule given will be used in place of the beta and c parameters.}
+}
+\value{
+List containing probability, standard deviation, and log likelihood
+values
 }
 \description{
 This function returns a list containing the estimated probabilities, means,
 standard deviations and log likelihoods of the fitted GMM. Implemented in
 C++
+}
+\references{
+\doi{10.1016/S0893-6080(97)00133-0}
 }

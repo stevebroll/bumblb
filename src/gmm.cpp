@@ -14,7 +14,22 @@
 //' @param pi_ Optional vector of prior distribution sampling probabilities
 //' @param mu_ Optional vector of distribution means
 //' @param sd_ Optional vector of distribution standard deviations
-//' @param
+//' @param max_iter Maximum number of iterations for EM algorithm. Default is
+//' 10,000
+//' @param tol Tolerance for convergence of log likelihood for EM algorithm.
+//' @param beta Optional parameter representing the starting \eqn{\beta} for
+//' annealing. For the default of 1, standard EM algorithm is run. Only needs to
+//' be specified for annealing if schedule_ is left NULL
+//' @param c Optional secondary parameter that determines growth rate of
+//' \eqn{\beta}. Only needs to be specified for annealing if schedule_ is left
+//' NULL
+//' @param schedule_ Optional scheduling for annealing, if not set to NULL the
+//' schedule given will be used in place of the beta and c parameters.
+//'
+//' @return List containing probability, standard deviation, and log likelihood
+//' values
+//'
+//'
 //' @export
 // [[Rcpp::export]]
 
@@ -91,7 +106,7 @@ Rcpp::List gmm(Rcpp::NumericVector Y, int d,
   //Set mu
   if(mu_.isNull()){
     // Random Values
-    Rcpp::NumericVector::iterator it = std::min_element(Y.begin(), Y.end());
+    Rcpp::NumericVector::iterator it  = std::min_element(Y.begin(), Y.end());
     Rcpp::NumericVector::iterator it2 = std::max_element(Y.begin(), Y.end());
     double Ymin = *it;
     double Ymax = *it2;

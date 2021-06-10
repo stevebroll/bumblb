@@ -16,7 +16,23 @@ blb_mix <- function(y, b, s, r, d) {
 #' @param pi_ Optional vector of prior distribution sampling probabilities
 #' @param mu_ Optional vector of distribution means
 #' @param sd_ Optional vector of distribution standard deviations
-#' @param
+#' @param max_iter Maximum number of iterations for EM algorithm. Default is
+#' 10,000
+#' @param tol Tolerance for convergence of log likelihood for EM algorithm.
+#' @param beta Optional parameter representing the starting \eqn{\beta} for
+#' annealing. For the default of 1, standard EM algorithm is run. Only needs to
+#' be specified for annealing if schedule_ is left NULL
+#' @param c Optional secondary parameter that determines growth rate of
+#' \eqn{\beta}. Only needs to be specified for annealing if schedule_ is left
+#' NULL
+#' @param schedule_ Optional scheduling for annealing, if not set to NULL the
+#' schedule given will be used in place of the beta and c parameters.
+#'
+#' @return List containing probability, standard deviation, and log likelihood
+#' values
+#'
+#' @references \doi{10.1016/S0893-6080(97)00133-0}
+#'
 #' @export
 gmm <- function(Y, d, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-5, beta = 1.0, c = 1.1, schedule_ = NULL) {
     .Call('_bumblb_gmm', PACKAGE = 'bumblb', Y, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_)
