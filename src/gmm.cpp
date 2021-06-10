@@ -3,6 +3,20 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+//' GMM with Optional Annealing
+//'
+//' This function returns a list containing the estimated probabilities, means,
+//' standard deviations and log likelihoods of the fitted GMM. Implemented in
+//' C++
+//'
+//' @param Y Numeric data vector
+//' @param d Number of distributions in mixture model
+//' @param pi_ Optional vector of prior distribution sampling probabilities
+//' @param mu_ Optional vector of distribution means
+//' @param sd_ Optional vector of distribution standard deviations
+//' @param
+//' @export
+// [[Rcpp::export]]
 
 Rcpp::List gmm(Rcpp::NumericVector Y, int d,
                    Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
