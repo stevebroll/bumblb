@@ -20,13 +20,13 @@ Rcpp::List gmm(Rcpp::NumericVector Y, int d,
   //Some assert statements so the code doesn't break
   assert(Y.size()>=3*d); // Make sure there is enough data to fit the gmm
   if(!pi_.isNull()){
-    assert(pi_.std::size()==d);
+    assert(pi_.length()==d);
   }
   if(!mu_.isNull()){
-    assert(mu_.std::size()==d);
+    assert(mu_.length()==d);
   }
   if(!sd_.isNull()){
-    assert(sd_.std::size()==d);
+    assert(sd_.length()==d);
   }
 
   //Initialize pi, mu, sigma
