@@ -3,10 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-// using namespace Rcpp;
 
-// Implement a Gaussian Mixture Model in C++
-// [[Rcpp::export]]
 Rcpp::List gmm(Rcpp::NumericVector X, int d,
                    Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
                    Rcpp::Nullable<Rcpp::NumericVector> mu_ = R_NilValue,
@@ -23,13 +20,13 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
   //Some assert statements so the code doesn't break
   assert(X.size()>=3*d); // Make sure there is enough data to fit the gmm
   if(!pi_.isNull()){
-    assert(pi_.size()==d);
+    assert(pi_.std::size()==d);
   }
   if(!mu_.isNull()){
-    assert(mu_.size()==d);
+    assert(mu_.std::size()==d);
   }
   if(!sd_.isNull()){
-    assert(sd_.size()==d);
+    assert(sd_.std::size()==d);
   }
 
   //Initialize pi, mu, sigma
