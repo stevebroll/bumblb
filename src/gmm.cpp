@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-Rcpp::List gmm(Rcpp::NumericVector X, int d,
+Rcpp::List gmm(Rcpp::NumericVector Y, int d,
                    Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
                    Rcpp::Nullable<Rcpp::NumericVector> mu_ = R_NilValue,
                    Rcpp::Nullable<Rcpp::NumericVector> sd_ = R_NilValue,
@@ -18,7 +18,7 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
   //
 
   //Some assert statements so the code doesn't break
-  assert(X.size()>=3*d); // Make sure there is enough data to fit the gmm
+  assert(Y.size()>=3*d); // Make sure there is enough data to fit the gmm
   if(!pi_.isNull()){
     assert(pi_.std::size()==d);
   }
@@ -62,7 +62,7 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
 
   Rcpp::Rcout << "Annealing Schedule:" << std::endl << schedule << std::endl;
 
-  const int N = X.size();
+  const int N = Y.size();
 
   //Set pi
   if(pi_.isNull()){
@@ -77,11 +77,11 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
   //Set mu
   if(mu_.isNull()){
     // Random Values
-    Rcpp::NumericVector::iterator it = std::min_element(X.begin(), X.end());
-    Rcpp::NumericVector::iterator it2 = std::max_element(X.begin(), X.end());
-    double Xmin = *it;
-    double Xmax = *it2;
-    mu = Rcpp::runif(d, Xmin, Xmax);
+    Rcpp::NumericVector::iterator it = std::min_element(Y.begin(), Y.end());
+    Rcpp::NumericVector::iterator it2 = std::max_element(Y.begin(), Y.end());
+    double Ymin = *it;
+    double Ymax = *it2;
+    mu = Rcpp::runif(d, Ymin, Ymax);
     std::sort(mu.begin(), mu.end()); //Sort mu
   }else{
     Rcpp::NumericVector temp(mu_);
@@ -90,8 +90,8 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
 
   //Set sigma
   if(sd_.isNull()){
-    // Set to SD(X)
-    double temp = Rcpp::sd(X);
+    // Set to SD(Y)
+    double temp = Rcpp::sd(Y);
     // Rcout << "Standard Deviation" << temp << std::endl;
     for(int i=0; i<d; i++) sd[i] = temp;
   }else{
@@ -127,11 +127,11 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
 
       // E-Step
       for(int row = 0; row<N; row++){
-        // Loop Through the X_i
+        // Loop Through the Y_i
         double denominator = 0;
         for(int col=0; col<d; col++){
           // Loop through the pi_i
-          gamma(row,col) = std::pow(pi[col]*R::dnorm(X[row], mu[col], sd[col], FALSE),beta);
+          gamma(row,col) = std::pow(pi[col]*R::dnorm(Y[row], mu[col], sd[col], FALSE),beta);
           denominator += gamma(row,col);
         }
         for(int col=0; col<d; col++){
@@ -146,7 +146,7 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
         mu[col] = 0.0;
         double temp = 0.0;
         for(int row=0; row<N; row++){
-          mu[col] += gamma(row,col)*X[row];
+          mu[col] += gamma(row,col)*Y[row];
           temp += gamma(row,col);
         }
         mu[col] /= temp;
@@ -157,7 +157,7 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
         sd[col] = 0.0;
         double temp = 0.0;
         for(int row=0; row<N; row++){
-          sd[col] += gamma(row,col)*std::pow(X[row]-mu[col], 2.0);
+          sd[col] += gamma(row,col)*std::pow(Y[row]-mu[col], 2.0);
           temp += gamma(row,col);
         }
         sd[col] /= temp;
@@ -181,7 +181,7 @@ Rcpp::List gmm(Rcpp::NumericVector X, int d,
         // Loops in correct order!
         temp = 0.0;
         for(int col = 0; col<d; col++){
-          temp += pi[col]*R::dnorm(X[row], mu[col], sd[col], FALSE);
+          temp += pi[col]*R::dnorm(Y[row], mu[col], sd[col], FALSE);
         }
         new_ll += std::log(temp);
       }

@@ -2,7 +2,7 @@
 #define GMM_H
 #include <Rcpp.h>
 
-Rcpp::List gmm(Rcpp::NumericVector X, int d,
+Rcpp::List gmm(Rcpp::NumericVector Y, int d,
                Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
                Rcpp::Nullable<Rcpp::NumericVector> mu_ = R_NilValue,
                Rcpp::Nullable<Rcpp::NumericVector> sd_ = R_NilValue,
