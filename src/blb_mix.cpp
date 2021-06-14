@@ -1,10 +1,50 @@
 #include <Rcpp.h>
 #include <stdlib.h>
 #include "gmm.h"
+#include <random>
 
+//' Mixture Model Bag of Little Bootstraps with Optional Annealing and Non-Uniform
+//' Sampling
+//'
+//' This function returns a list containing the estimated probabilities, means,
+//' standard deviations and log likelihoods of the fitted GMM. Implemented in
+//' C++
+//'
+//' @param Y Numeric data vector
+//' @param d Number of distributions in mixture model
+//' @param pr_ Optional vector of sampling probabilities. If null, sampling is
+//' uniform
+//' @param pi_ Optional vector of prior distribution probabilities
+//' @param mu_ Optional vector of distribution means
+//' @param sd_ Optional vector of distribution standard deviations
+//' @param max_iter Maximum number of iterations for EM algorithm. Default is
+//' 10,000
+//' @param tol Tolerance for convergence of log likelihood for EM algorithm.
+//' @param beta Optional parameter representing the starting \eqn{\beta} for
+//' annealing. For the default of 1, standard EM algorithm is run. Only needs to
+//' be specified for annealing if schedule_ is left NULL
+//' @param c Optional secondary parameter that determines growth rate of
+//' \eqn{\beta}. Only needs to be specified for annealing if schedule_ is left
+//' NULL
+//' @param schedule_ Optional scheduling for annealing, if not set to NULL the
+//' schedule given will be used in place of the beta and c parameters.
+//'
+//' @return List containing probability, standard deviation, and log likelihood
+//' values
+//'
+//'
+//' @export
 // [[Rcpp::export]]
 
-Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d){
+Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
+                   Rcpp::Nullable<Rcpp::NumericVector> pr_ = R_NilValue,
+                   Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
+                   Rcpp::Nullable<Rcpp::NumericVector> mu_ = R_NilValue,
+                   Rcpp::Nullable<Rcpp::NumericVector> sd_ = R_NilValue,
+                   int max_iter = 10000, double tol = 1e-5,
+                   double beta = 1.0, double c = 1.1,
+                   Rcpp::Nullable<Rcpp::NumericVector> schedule_ = R_NilValue){
+
   Rcpp::NumericMatrix mu_lower(s,d);
   Rcpp::NumericMatrix mu_upper(s,d);
   Rcpp::NumericMatrix sd_lower(s,d);
@@ -23,6 +63,8 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d){
     Rcpp::NumericMatrix fit_pi(r,d);
 
     for(int k=0; k < r; ++k) {
+      // Resample to n length here
+
       // Call gmm.cpp
     }
 
