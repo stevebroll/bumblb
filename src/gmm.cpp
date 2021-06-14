@@ -11,7 +11,7 @@
 //'
 //' @param Y Numeric data vector
 //' @param d Number of distributions in mixture model
-//' @param pi_ Optional vector of prior distribution sampling probabilities
+//' @param pi_ Optional vector of prior distribution probabilities
 //' @param mu_ Optional vector of distribution means
 //' @param sd_ Optional vector of distribution standard deviations
 //' @param max_iter Maximum number of iterations for EM algorithm. Default is

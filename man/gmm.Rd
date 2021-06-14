@@ -22,7 +22,7 @@ gmm(
 
 \item{d}{Number of distributions in mixture model}
 
-\item{pi_}{Optional vector of prior distribution sampling probabilities}
+\item{pi_}{Optional vector of prior distribution probabilities}
 
 \item{mu_}{Optional vector of distribution means}
 
@@ -52,7 +52,4 @@ values
 This function returns a list containing the estimated probabilities, means,
 standard deviations and log likelihoods of the fitted GMM. Implemented in
 C++
-}
-\references{
-\doi{10.1016/S0893-6080(97)00133-0}
 }
