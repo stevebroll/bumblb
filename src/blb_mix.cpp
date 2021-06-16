@@ -1,7 +1,9 @@
-#include <Rcpp.h>
 #include <stdlib.h>
 #include "gmm.h"
 #include <random>
+
+using namespace Rcpp ;
+
 
 //' Mixture Model Bag of Little Bootstraps with Optional Annealing and Non-Uniform
 //' Sampling
@@ -10,7 +12,7 @@
 //' standard deviations and log likelihoods of the fitted GMM. Implemented in
 //' C++
 //'
-//' @param Y Numeric data vector
+//' @param y Numeric data vector
 //' @param d Number of distributions in mixture model
 //' @param pr_ Optional vector of sampling probabilities. If null, sampling is
 //' uniform
@@ -36,6 +38,7 @@
 //' @export
 // [[Rcpp::export]]
 
+
 Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
                    Rcpp::Nullable<Rcpp::NumericVector> pr_ = R_NilValue,
                    Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
@@ -51,19 +54,40 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
   Rcpp::NumericMatrix sd_upper(s,d);
   Rcpp::NumericMatrix pi_lower(s,d);
   Rcpp::NumericMatrix pi_upper(s,d);
+
+  Rcpp::NumericMatrix fit_mu(r,d);
+  Rcpp::NumericMatrix fit_sd(r,d);
+  Rcpp::NumericMatrix fit_pi(r,d);
+
+  int n = y.length();
+  Rcpp::NumericVector pr(n);
+  if(pr_.isNull()){
+    pr.fill(1); // sample will standardize prob arg
+  }else{
+    Rcpp::NumericVector pr(n);
+    Rcpp::NumericVector temp(pr_);
+    pr = temp;
+  }
+
+
   //const int n = y.size();
 
   for (int j=0; j < s; ++j) {
 
-    // Sample Here
 
+   // Rcpp::NumericVector samp = RcppArmadillo::sample(index, b, false, pr);
+   //Rcpp::NumericVector samp = sample(int n = n, int size = b, bool replace = false, sugar::probs_t probs = pr);
+    Rcpp::IntegerVector index = sample(n, b, false, pr);
+    Rcpp::NumericVector samp = pr[index];
 
-    Rcpp::NumericMatrix fit_mu(r,d);
-    Rcpp::NumericMatrix fit_sd(r,d);
-    Rcpp::NumericMatrix fit_pi(r,d);
 
     for(int k=0; k < r; ++k) {
-      // Resample to n length here
+
+      // this sample call's probability could be inversely proportional to pr
+      // in case of leverage sampling.
+      Rcpp::IntegerVector reindex = sample(b, n, true, pr);
+      Rcpp::NumericVector resamp = samp[reindex];
+
 
       // Call gmm.cpp
     }
