@@ -13,6 +13,9 @@ using namespace Rcpp ;
 //' C++
 //'
 //' @param y Numeric data vector
+//' @param b Bag of Little Bootstraps sample size
+//' @param s Number of sample (of size b) to be taken
+//' @param r Number of Monte Carlo iterations for each sample
 //' @param d Number of distributions in mixture model
 //' @param pr_ Optional vector of sampling probabilities. If null, sampling is
 //' uniform

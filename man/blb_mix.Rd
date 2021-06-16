@@ -23,6 +23,14 @@ blb_mix(
 )
 }
 \arguments{
+\item{y}{Numeric data vector}
+
+\item{b}{Bag of Little Bootstraps sample size}
+
+\item{s}{Number of sample (of size b) to be taken}
+
+\item{r}{Number of Monte Carlo iterations for each sample}
+
 \item{d}{Number of distributions in mixture model}
 
 \item{pr_}{Optional vector of sampling probabilities. If null, sampling is
@@ -49,8 +57,6 @@ NULL}
 
 \item{schedule_}{Optional scheduling for annealing, if not set to NULL the
 schedule given will be used in place of the beta and c parameters.}
-
-\item{Y}{Numeric data vector}
 }
 \value{
 List containing probability, standard deviation, and log likelihood
