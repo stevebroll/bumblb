@@ -8,7 +8,7 @@
 #' standard deviations and log likelihoods of the fitted GMM. Implemented in
 #' C++
 #'
-#' @param y Numeric data vector
+#' @param Y Numeric data vector
 #' @param b Bag of Little Bootstraps sample size
 #' @param s Number of sample (of size b) to be taken
 #' @param r Number of Monte Carlo iterations for each sample
@@ -28,15 +28,16 @@
 #' \eqn{\beta}. Only needs to be specified for annealing if schedule_ is left
 #' NULL
 #' @param schedule_ Optional scheduling for annealing, if not set to NULL the
-#' schedule given will be used in place of the beta and c parameters.
+#' schedule given will be used in place of the beta and c parameters
 #'
-#' @return List containing probability, standard deviation, and log likelihood
-#' values
+#' @return List containing estimates for mixture probabilities, means, and
+#' standard deviations
+#'
 #'
 #'
 #' @export
-blb_mix <- function(y, b, s, r, d, pr_ = NULL, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-5, beta = 1.0, c = 1.1, schedule_ = NULL) {
-    .Call('_bumblb_blb_mix', PACKAGE = 'bumblb', y, b, s, r, d, pr_, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_)
+blb_mix <- function(Y, b, s, r, d, pr_ = NULL, pi_ = NULL, mu_ = NULL, sd_ = NULL, max_iter = 10000L, tol = 1e-5, beta = 1.0, c = 1.1, schedule_ = NULL) {
+    .Call('_bumblb_blb_mix', PACKAGE = 'bumblb', Y, b, s, r, d, pr_, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_)
 }
 
 #' GMM with Optional Annealing
