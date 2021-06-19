@@ -12,7 +12,7 @@ using namespace Rcpp ;
 //' standard deviations and log likelihoods of the fitted GMM. Implemented in
 //' C++
 //'
-//' @param y Numeric data vector
+//' @param Y Numeric data vector
 //' @param b Bag of Little Bootstraps sample size
 //' @param s Number of sample (of size b) to be taken
 //' @param r Number of Monte Carlo iterations for each sample
@@ -42,7 +42,7 @@ using namespace Rcpp ;
 // [[Rcpp::export]]
 
 
-Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
+Rcpp::List blb_mix(Rcpp::NumericVector Y, int b, int s, int r, int d,
                    Rcpp::Nullable<Rcpp::NumericVector> pr_ = R_NilValue,
                    Rcpp::Nullable<Rcpp::NumericVector> pi_ = R_NilValue,
                    Rcpp::Nullable<Rcpp::NumericVector> mu_ = R_NilValue,
@@ -50,6 +50,8 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
                    int max_iter = 10000, double tol = 1e-5,
                    double beta = 1.0, double c = 1.1,
                    Rcpp::Nullable<Rcpp::NumericVector> schedule_ = R_NilValue){
+
+
 
   Rcpp::NumericMatrix mu_lower(s,d);
   Rcpp::NumericMatrix mu_upper(s,d);
@@ -62,7 +64,7 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
   Rcpp::NumericMatrix fit_sd(r,d);
   Rcpp::NumericMatrix fit_pi(r,d);
 
-  int n = y.length();
+  int n = Y.length();
   Rcpp::NumericVector pr(n);
   if(pr_.isNull()){
     pr.fill(1); // sample will standardize prob arg
@@ -72,8 +74,13 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
     pr = temp;
   }
 
+  Rcpp::NumericMatrix piout(s,d);
+  Rcpp::NumericMatrix muout(s,d);
+  Rcpp::NumericMatrix sdout(s,d);
 
-  //const int n = y.size();
+
+
+
 
   for (int j=0; j < s; ++j) {
 
@@ -81,7 +88,13 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
    // Rcpp::NumericVector samp = RcppArmadillo::sample(index, b, false, pr);
    //Rcpp::NumericVector samp = sample(int n = n, int size = b, bool replace = false, sugar::probs_t probs = pr);
     Rcpp::IntegerVector index = sample(n, b, false, pr);
-    Rcpp::NumericVector samp = pr[index];
+    Rcpp::NumericVector samp = Y[index];
+
+    Rcpp::NumericMatrix MCpi(r,d);
+    Rcpp::NumericMatrix MCmu(r,d);
+    Rcpp::NumericMatrix MCsd(r,d);
+    Rcpp::NumericVector MCll(r);
+
 
 
     for(int k=0; k < r; ++k) {
@@ -92,14 +105,44 @@ Rcpp::List blb_mix(Rcpp::NumericVector y, int b, int s, int r, int d,
       Rcpp::NumericVector resamp = samp[reindex];
 
 
-      // Call gmm.cpp
+      Rcpp::List out = gmm(Y, d, pi_, mu_, sd_, max_iter, tol, beta, c, schedule_);
+
+      // this could likely be made faster with high d values, but assigning to
+      // (_, k) or .column(k) threw Exporter.h line 31 error
+
+      Rcpp::NumericVector pi = out["pi"];
+      Rcpp::NumericVector mu = out["mu"];
+      Rcpp::NumericVector sd = out["sd"];
+
+      //double loglik = out["loglik"];
+      //MCll[r] = loglik;
+
+      for(int i=0; i<d; ++i) {
+        MCpi(r,i) = pi[i];
+        MCmu(r,i) = mu[i];
+        MCsd(r,i) = sd[i];
+      }
+
     }
 
-    // means and CIs here
+    Rcpp::NumericVector mean_pi = Rcpp::colMeans(MCpi);
+    Rcpp::NumericVector mean_mu = Rcpp::colMeans(MCmu);
+    Rcpp::NumericVector mean_sd = Rcpp::colMeans(MCsd);
+
+
+    // This also likely could be sped up
+
+    for(int i=0; i<d; ++i) {
+      piout(s,i) = mean_pi[i];
+      muout(s,i) = mean_mu[i];
+      sdout(s,i) = mean_sd[i];
+    }
+
   }
 
-  // Return list here
+  // manually assign data frame attributes to list?
 
-
-  return(0);
+  return Rcpp::List::create(Rcpp::Named("pi") = colMeans(piout),
+                            Rcpp::Named("mu") = colMeans(muout),
+                            Rcpp::Named("sd") = colMeans(sdout));
 }
