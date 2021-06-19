@@ -32,10 +32,11 @@ using namespace Rcpp ;
 //' \eqn{\beta}. Only needs to be specified for annealing if schedule_ is left
 //' NULL
 //' @param schedule_ Optional scheduling for annealing, if not set to NULL the
-//' schedule given will be used in place of the beta and c parameters.
+//' schedule given will be used in place of the beta and c parameters
 //'
-//' @return List containing probability, standard deviation, and log likelihood
-//' values
+//' @return List containing estimates for mixture probabilities, means, and
+//' standard deviations
+//'
 //'
 //'
 //' @export
@@ -50,7 +51,6 @@ Rcpp::List blb_mix(Rcpp::NumericVector Y, int b, int s, int r, int d,
                    int max_iter = 10000, double tol = 1e-5,
                    double beta = 1.0, double c = 1.1,
                    Rcpp::Nullable<Rcpp::NumericVector> schedule_ = R_NilValue){
-
 
 
   Rcpp::NumericMatrix mu_lower(s,d);
@@ -77,9 +77,6 @@ Rcpp::List blb_mix(Rcpp::NumericVector Y, int b, int s, int r, int d,
   Rcpp::NumericMatrix piout(s,d);
   Rcpp::NumericMatrix muout(s,d);
   Rcpp::NumericMatrix sdout(s,d);
-
-
-
 
 
   for (int j=0; j < s; ++j) {
@@ -141,8 +138,11 @@ Rcpp::List blb_mix(Rcpp::NumericVector Y, int b, int s, int r, int d,
   }
 
   // manually assign data frame attributes to list?
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("pi") = colMeans(piout),
+                     Rcpp::Named("mu") = colMeans(muout),
+                     Rcpp::Named("sd") = colMeans(sdout));
+  out.attr("class") = "data.frame";
 
-  return Rcpp::List::create(Rcpp::Named("pi") = colMeans(piout),
-                            Rcpp::Named("mu") = colMeans(muout),
-                            Rcpp::Named("sd") = colMeans(sdout));
+  return out;
+
 }
