@@ -6,7 +6,7 @@
 Sampling}
 \usage{
 blb_mix(
-  y,
+  Y,
   b,
   s,
   r,
@@ -23,7 +23,7 @@ blb_mix(
 )
 }
 \arguments{
-\item{y}{Numeric data vector}
+\item{Y}{Numeric data vector}
 
 \item{b}{Bag of Little Bootstraps sample size}
 
@@ -56,11 +56,11 @@ be specified for annealing if schedule_ is left NULL}
 NULL}
 
 \item{schedule_}{Optional scheduling for annealing, if not set to NULL the
-schedule given will be used in place of the beta and c parameters.}
+schedule given will be used in place of the beta and c parameters}
 }
 \value{
-List containing probability, standard deviation, and log likelihood
-values
+List containing estimates for mixture probabilities, means, and
+standard deviations
 }
 \description{
 This function returns a list containing the estimated probabilities, means,
